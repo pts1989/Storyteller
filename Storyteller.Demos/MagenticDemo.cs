@@ -1,26 +1,14 @@
-﻿using Azure.AI.Agents.Persistent;
-using Microsoft.Extensions.AI;
-using Microsoft.SemanticKernel;
+﻿using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.Agents.Magentic;
 using Microsoft.SemanticKernel.Agents.OpenAI;
 using Microsoft.SemanticKernel.Agents.Orchestration;
-using Microsoft.SemanticKernel.Agents.Orchestration.Concurrent;
 using Microsoft.SemanticKernel.Agents.Runtime.InProcess;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
-using OllamaSharp.Models.Chat;
-using OpenAI.Assistants;
-using OpenAI.Chat;
-using OpenAI.Files;
-using Storyteller.Core;
-using Storyteller.Demos.internalUtilities;
+using Storyteller.Core; // Assuming this is your custom namespace
+using Storyteller.Demos.internalUtilities; // Assuming this is your custom namespace
 using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Storyteller.Demos
@@ -30,79 +18,110 @@ namespace Storyteller.Demos
         public async Task RunAsync()
         {
             Kernel kernel = KernelFactory.CreateKernelForModel("qwen3:8b");
-            var SheetAgent = new ChatCompletionAgent()
-            {
-                Kernel = kernel,
-                Name = "SheetAgent",
-                Description = "Je maakt charactersheets voor personages",
-                Instructions = "Voor roleplay personages bedenk jij het character sheet. Dit is gebaseerd op allerlei informatie uit eerdere opdrachten."
-            };
 
-            var ConceptAgent = new ChatCompletionAgent()
+            // Agent 1: The initial idea generator.
+            var conceptAgent = new ChatCompletionAgent()
             {
                 Kernel = KernelFactory.CreateKernelForModel("qwen3:8b"),
                 Name = "ConceptAgent",
-                Description = "Je bent goed in het bedenken van concepten voor roleplay characters. De uitwerking wordt door andere agents gedaan",
-                Instructions = "Bedenk een character concept, de achtergrond en naam worden door andere gedaan, het concept moet interessante haakjes hebben waar andere op verder kunnen"
+                Description = "You are an expert at creating high-level concepts for roleplay characters. Other agents will handle the details.",
+                Instructions =
+                    """
+                    You create a character concept based on the user's request.
+                    Your job is ONLY to define the core archetype, a key skill, and a major flaw.
+                    Provide interesting hooks for other agents to expand upon. Do NOT write a background story or a name.
+                    Example Output:
+                    - Concept: A grizzled, exiled dwarven blacksmith.
+                    - Key Skill: Can identify any metal by taste.
+                    - Major Flaw: Deeply mistrusts all forms of magic.
+                    """
             };
 
+            // Agent 2: The storyteller who fleshes out the concept.
             var backgroundExpert = new ChatCompletionAgent()
             {
                 Kernel = KernelFactory.CreateKernelForModel("qwen3:8b"),
-                Name = "backgroundExpert",
-                Description = "Schrijft een korte, sfeervolle achtergrond voor een personage.",
-                Instructions = "Je bent een creatieve schrijver, je schrijft background verhalen voor roleplay personages. Hierbij laat je de naam nog open."
+                Name = "BackgroundExpert",
+                Description = "Writes a short, atmospheric background story for a character concept.",
+                Instructions =
+                    """
+                    You are a creative writer. Take the character concept provided by the ConceptAgent and write a brief, compelling background story (2-3 paragraphs).
+                    The story should explain the character's key skill and major flaw. Leave the character's name open.
+                    """
             };
 
+            // Agent 3: The namer who uses the background to find a fitting name.
             var nameGenerator = new ChatCompletionAgent()
             {
-                Kernel= KernelFactory.CreateKernelForModel("qwen3:8b"),
-                Name = "nameGenerator",
-                Description = "Genereert een passende en unieke naam voor een personage.",
-                Instructions = "Genereer eenpassende naam op basis van de eerder verkregen informatie van het personage"
+                Kernel = KernelFactory.CreateKernelForModel("qwen3:8b"),
+                Name = "NameGenerator",
+                Description = "Generates a fitting and unique name based on a character's background.",
+                Instructions = "You are a master namer. Based on the concept and background story from the other agents, generate one fitting and memorable name for the character."
             };
 
-            // --- Orchestratie ---
-            OrchestrationMonitor monitor = new();
+            // Agent 4: The final assembler who creates the character sheet.
+            var sheetAgent = new ChatCompletionAgent()
+            {
+                Kernel = kernel,
+                Name = "SheetAgent",
+                Description = "You create the final, formatted character sheet.",
+                Instructions =
+                    """
+                    You are the final assembler. Your task is to gather all the information from the other agents (Concept, Background, and Name) and compile it into a single, clean character sheet.
+                    The final output should follow this exact format:
+
+                    # Character Sheet
+                    **Name:** [Insert Name from NameGenerator]
+                    
+                    ## Concept
+                    [Insert Concept from ConceptAgent]
+                    
+                    ## Background
+                    [Insert Background from BackgroundExpert]
+                    """
+            };
+
+            // --- Orchestration ---
+            var monitor = new OrchestrationMonitor();
             Kernel managerKernel = KernelFactory.CreateKernelForModel("qwen3:8b");
-            StandardMagenticManager manager =
-                new(managerKernel.GetRequiredService<IChatCompletionService>(), new OpenAIPromptExecutionSettings())
+
+            var manager =
+                new StandardMagenticManager(managerKernel.GetRequiredService<IChatCompletionService>(), new OpenAIPromptExecutionSettings())
                 {
                     MaximumInvocationCount = 20,
                 };
-            MagenticOrchestration orchestration = new (manager, ConceptAgent, SheetAgent, backgroundExpert, nameGenerator)
+
+            var orchestration = new MagenticOrchestration(manager, conceptAgent, sheetAgent, backgroundExpert, nameGenerator)
             {
                 ResponseCallback = monitor.ResponseCallback,
-                //StreamingResponseCallback = monitor.StreamingResultCallback,
             };
-            string userInput = "Genereert een compleet character sheet op basis van een simpel concept.";
 
-            Console.WriteLine($"GEZAMENLIJKE INPUT: \"{userInput}\"\n");
-            Console.WriteLine("--- Resultaten van de Brainstorm ---");
+            string userInput = "Generate a complete character sheet based on a simple concept: a disgraced knight seeking redemption.";
 
+            Console.WriteLine($"\nUSER INPUT: \"{userInput}\"\n");
+            Console.WriteLine("--- Brainstorming Results ---");
 
-            // OPLOSSING 3: Maak een runtime aan en geef deze mee
+            // Create and start the agent runtime environment.
             var runtime = new InProcessRuntime();
             await runtime.StartAsync();
+
             OrchestrationResult<string> results = await orchestration.InvokeAsync(userInput, runtime);
 
-
+            // Display the final result.
             string output = await results.GetValueAsync();
-            Console.BackgroundColor = ConsoleColor.DarkBlue;
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine($"\n# RESULT: {output}");
-            Console.BackgroundColor = ConsoleColor.White;
-            Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.WriteLine("\n\nORCHESTRATION HISTORY");
+            Console.ForegroundColor = ConsoleColor.DarkBlue;
+            Console.WriteLine($"\n# FINAL RESULT:\n{output}");
+            Console.ResetColor();
 
-            foreach (Microsoft.SemanticKernel.ChatMessageContent message in monitor.History)
+            // Display the full conversation history.
+            Console.WriteLine("\n\n--- ORCHESTRATION HISTORY ---\n");
+            foreach (ChatMessageContent message in monitor.History)
             {
                 AIHelpers.WriteAgentChatMessage(message);
             }
+
             await runtime.RunUntilIdleAsync();
-
-
-            Console.ForegroundColor = ConsoleColor.White;
-        }  
+            Console.ResetColor();
+        }
     }
 }

@@ -60,6 +60,8 @@ namespace Storyteller.Runner
 
                 if (!exit)
                 {
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.BackgroundColor = ConsoleColor.Black;
                     Console.WriteLine("\nDruk op een toets om terug te keren naar het menu...");
                     Console.ReadKey();
                 }

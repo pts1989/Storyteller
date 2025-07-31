@@ -83,10 +83,8 @@ namespace Storyteller.Demos
 
             
             string output = await results.GetValueAsync(TimeSpan.FromSeconds(3000));
-            Console.BackgroundColor = ConsoleColor.DarkBlue;
-            Console.ForegroundColor = ConsoleColor.White;
+            Console.ForegroundColor = ConsoleColor.DarkBlue;
             Console.WriteLine($"\n# RESULT: {output}");
-            Console.BackgroundColor = ConsoleColor.White;
             Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine("\n\nORCHESTRATION HISTORY");
 

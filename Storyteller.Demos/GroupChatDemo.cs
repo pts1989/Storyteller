@@ -1,25 +1,13 @@
-﻿using Azure.AI.Agents.Persistent;
-using Microsoft.Extensions.AI;
-using Microsoft.SemanticKernel;
+﻿using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.Agents.OpenAI;
 using Microsoft.SemanticKernel.Agents.Orchestration;
-using Microsoft.SemanticKernel.Agents.Orchestration.Concurrent;
 using Microsoft.SemanticKernel.Agents.Orchestration.GroupChat;
 using Microsoft.SemanticKernel.Agents.Runtime.InProcess;
 using Microsoft.SemanticKernel.ChatCompletion;
-using OllamaSharp.Models.Chat;
-using OpenAI.Assistants;
-using OpenAI.Chat;
-using OpenAI.Files;
-using Storyteller.Core;
-using Storyteller.Demos.internalUtilities;
+using Storyteller.Core; // Assuming this is your custom namespace
+using Storyteller.Demos.internalUtilities; // Assuming this is your custom namespace
 using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Storyteller.Demos
@@ -29,71 +17,98 @@ namespace Storyteller.Demos
         public async Task RunAsync()
         {
             Kernel kernel = KernelFactory.CreateKernelForModel("qwen3:8b");
+
+            // Agent 1: The Hero
             var hero = new ChatCompletionAgent()
             {
                 Kernel = kernel,
-                Name = "Aragorn_De_Held",
-                Description = "Een dappere en nobele krijger die de leiding neemt.",
-                Instructions = "Jij bent Aragorn, een dappere en nobele krijger. Je bent recht door zee, beschermend en neemt graag de leiding. Spreek plechtig."
+                Name = "Aragorn_The_Hero",
+                Description = "A brave and noble warrior who takes the lead.",
+                Instructions =
+                    """
+                    You are Aragorn, a noble and courageous warrior.
+                    Your personality: direct, protective, and a natural leader.
+                    Your speaking style: formal and solemn.
+                    Your role: Assess threats, protect your companions, and suggest bold, direct actions. Always take the lead when there is doubt.
+                    """
             };
 
+            // Agent 2: The Thief
             var thief = new ChatCompletionAgent()
             {
                 Kernel = kernel,
-                Name = "Lila_De_Dief",
-                Description = "Een sarcastische en praktische dief die scherpe opmerkingen maakt.",
-                Instructions = "Jij bent Lila, een snelle en sarcastische dief. Je bent cynisch, praktisch en maakt graag scherpe opmerkingen. Je vertrouwt niemand volledig."
+                Name = "Lila_The_Thief",
+                Description = "A sarcastic and practical thief who makes sharp remarks.",
+                Instructions =
+                    """
+                    You are Lila, a quick-witted and sarcastic thief.
+                    Your personality: cynical, practical, and deeply mistrustful.
+                    Your speaking style: sharp, witty, and informal.
+                    Your role: Point out risks, look for traps, and always consider what there is to gain. You question everything and everyone.
+                    """
             };
 
+            // Agent 3: The Mage
             var mage = new ChatCompletionAgent()
             {
-                Kernel= kernel,
-                Name = "Zoltan_De_Tovenaar",
-                Description = "Een wijze maar cryptische magiër die in raadsels spreekt.",
-                Instructions = "Jij bent Zoltan, een oude, wijze maar cryptische magiër. Je spreekt in raadsels en denkt na over de diepere betekenis van dingen."
+                Kernel = kernel,
+                Name = "Zoltan_The_Mage",
+                Description = "A wise but cryptic magician who speaks in riddles.",
+                Instructions =
+                    """
+                    You are Zoltan, an ancient, wise, and cryptic mage.
+                    Your personality: contemplative, detached, and mysterious.
+                    Your speaking style: speaks in metaphors, riddles, and abstract observations.
+                    Your role: Sense the unseen magical forces at play. Ponder the deeper meaning of events and offer cryptic but insightful advice.
+                    """
             };
 
-            // --- Orchestratie ---
+            // --- Orchestration ---
             ChatHistory history = [];
 
-            ValueTask responseCallback(Microsoft.SemanticKernel.ChatMessageContent response)
+            ValueTask ResponseCallback(ChatMessageContent response)
             {
                 history.Add(response);
                 return ValueTask.CompletedTask;
             }
 
-            var orchestration = new GroupChatOrchestration(new RoundRobinGroupChatManager { MaximumInvocationCount = 5 }, hero, thief, mage)
+            var orchestration = new GroupChatOrchestration(
+                // Use a round-robin manager with a maximum of 5 turns for this interaction.
+                new RoundRobinGroupChatManager { MaximumInvocationCount = 5 },
+                hero, thief, mage)
             {
-                ResponseCallback = responseCallback
+                ResponseCallback = ResponseCallback
             };
-            string userInput = "Jullie staan voor een gigantische, verzegelde stenen deur. Een vreemd paars licht pulseert in de kieren. Wat doen jullie?";
 
-            Console.WriteLine($"GEZAMENLIJKE INPUT: \"{userInput}\"\n");
-            Console.WriteLine("--- Resultaten van de Brainstorm ---");
+            // The initial scenario to kick off the group chat.
+            string userInput = "You stand before a giant, sealed stone door. A strange purple light pulses from the cracks. What do you do?";
 
+            Console.WriteLine($"\nSCENARIO: \"{userInput}\"\n");
+            Console.WriteLine("--- Group Chat Results ---");
 
-            // OPLOSSING 3: Maak een runtime aan en geef deze mee
+            // Create a runtime environment and pass it to the orchestration.
             var runtime = new InProcessRuntime();
             await runtime.StartAsync();
+
             OrchestrationResult<string> results = await orchestration.InvokeAsync(userInput, runtime);
 
-
-            string output = await results.GetValueAsync(TimeSpan.FromSeconds(3000));
+            // Display the final summary from the orchestration.
+            string output = await results.GetValueAsync(TimeSpan.FromSeconds(300));
             Console.BackgroundColor = ConsoleColor.DarkBlue;
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine($"\n# RESULT: {output}");
-            Console.BackgroundColor = ConsoleColor.White;
-            Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.WriteLine("\n\nORCHESTRATION HISTORY");
+            Console.WriteLine($"\n# FINAL SUMMARY: {output}");
+            Console.ResetColor();
 
-            foreach (Microsoft.SemanticKernel.ChatMessageContent message in history)
+            // Display the full conversation history.
+            Console.WriteLine("\n\n--- ORCHESTRATION HISTORY ---\n");
+            foreach (ChatMessageContent message in history)
             {
+                // Helper method to format and print agent messages.
                 AIHelpers.WriteAgentChatMessage(message);
             }
+
             await runtime.RunUntilIdleAsync();
-
-
-            Console.ForegroundColor = ConsoleColor.White;
-        }  
+            Console.ResetColor();
+        }
     }
 }
