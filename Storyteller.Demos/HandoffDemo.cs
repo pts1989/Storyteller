@@ -1,28 +1,13 @@
-﻿using Azure.AI.Agents.Persistent;
-using Microsoft.Extensions.AI;
-using Microsoft.SemanticKernel;
+﻿using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
-using Microsoft.SemanticKernel.Agents.OpenAI;
 using Microsoft.SemanticKernel.Agents.Orchestration;
-using Microsoft.SemanticKernel.Agents.Orchestration.Concurrent;
-using Microsoft.SemanticKernel.Agents.Orchestration.GroupChat;
 using Microsoft.SemanticKernel.Agents.Orchestration.Handoff;
 using Microsoft.SemanticKernel.Agents.Runtime.InProcess;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
-using OllamaSharp.Models.Chat;
-using OpenAI.Assistants;
-using OpenAI.Chat;
-using OpenAI.Files;
 using Storyteller.Core;
 using Storyteller.Demos.internalUtilities;
-using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
+
 
 namespace Storyteller.Demos
 {

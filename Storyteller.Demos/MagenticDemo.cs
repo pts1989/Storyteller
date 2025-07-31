@@ -1,15 +1,12 @@
 ﻿using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.Agents.Magentic;
-using Microsoft.SemanticKernel.Agents.OpenAI;
 using Microsoft.SemanticKernel.Agents.Orchestration;
 using Microsoft.SemanticKernel.Agents.Runtime.InProcess;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
-using Storyteller.Core; // Assuming this is your custom namespace
-using Storyteller.Demos.internalUtilities; // Assuming this is your custom namespace
-using System;
-using System.Threading.Tasks;
+using Storyteller.Core; 
+using Storyteller.Demos.internalUtilities; 
 
 namespace Storyteller.Demos
 {

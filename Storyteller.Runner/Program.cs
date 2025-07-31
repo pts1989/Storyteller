@@ -54,7 +54,7 @@ namespace Storyteller.Runner
                         exit = true;
                         break;
                     default:
-                        Console.WriteLine("Ongeldige keuze. Probeer opnieuw.");
+                        Console.WriteLine("Invalid choice. Try again.");
                         break;
                 }
 
@@ -62,7 +62,7 @@ namespace Storyteller.Runner
                 {
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.BackgroundColor = ConsoleColor.Black;
-                    Console.WriteLine("\nDruk op een toets om terug te keren naar het menu...");
+                    Console.WriteLine("\nPress any key to return to the menu...");
                     Console.ReadKey();
                 }
             }

@@ -30,30 +30,67 @@ namespace Storyteller.Demos
         public async Task RunAsync()
         {
             Kernel kernel = KernelFactory.CreateKernelForModel("qwen3:8b");
-
             var worldBuilder = new ChatCompletionAgent()
             {
                 Kernel = kernel,
-                Name = "Omgevings_Specialist",
-                Instructions = "Jij bent een meester-verhalenverteller. Beschrijf een rijke, sfeervolle omgeving op basis van de input. Focus enkel op de omgeving.",
-                Description = "Jij bent een meester-verhalenverteller. Beschrijf een rijke, sfeervolle omgeving op basis van de input."
+                Name = "World_Builder",
+                Description = "Builds a rich, atmospheric scene based on the initial prompt.",
+                Instructions =
+                    """
+                    You are a master world-builder. Based on the user's input, describe a rich, atmospheric environment using vivid sensory details (sights, sounds, smells).
+                    Do NOT include any characters or plot events. Your focus is solely on setting the scene.
+                    """
             };
 
             var characterCreator = new ChatCompletionAgent()
             {
                 Kernel = kernel,
-                Name = "Personage_Ontwerper",
-                Description = "Jij creëert memorabele personages. ",
-                Instructions = "Jij creëert memorabele personages. Introduceer één uniek personage dat past in de gegeven setting."
+                Name = "Character_Creator",
+                Description = "Creates a memorable character that fits within the previously established environment.",
+                Instructions =
+                    """
+                    You are a master character designer. Based on the environment described in the preceding text, introduce a single, memorable character.
+                    Describe their appearance, their immediate goal or motivation, and a simple action they are performing within that scene. Ensure the character feels like a natural part of the world.
+                    """
             };
 
             var plotGenerator = new ChatCompletionAgent()
             {
                 Kernel = kernel,
-                Name = "Conflict_Generator",
-                Instructions = "Jij bent een meester van spanning. Introduceer een onverwachte gebeurtenis of conflict dat past bij de setting en het personage.",
-                Description= "Jij bent een meester van spanning. Introduceer een onverwachte gebeurtenis of conflicten voor het verhaal."
+                Name = "Plot_Generator",
+                Description = "Introduces a conflict or inciting incident into the scene.",
+                Instructions =
+                    """
+                    You are a master of suspense. The scene and character are set. Now, introduce a single, unexpected event or an immediate conflict that complicates the character's situation.
+                    Your goal is to create tension and leave a question in the reader's mind about what will happen next. Build directly upon the established setting and character actions.
+                    """
             };
+
+
+
+            //var worldBuilder = new ChatCompletionAgent()
+            //{
+            //    Kernel = kernel,
+            //    Name = "Omgevings_Specialist",
+            //    Instructions = "Jij bent een meester-verhalenverteller. Beschrijf een rijke, sfeervolle omgeving op basis van de input. Focus enkel op de omgeving.",
+            //    Description = "Jij bent een meester-verhalenverteller. Beschrijf een rijke, sfeervolle omgeving op basis van de input."
+            //};
+
+            //var characterCreator = new ChatCompletionAgent()
+            //{
+            //    Kernel = kernel,
+            //    Name = "Personage_Ontwerper",
+            //    Description = "Jij creëert memorabele personages. ",
+            //    Instructions = "Jij creëert memorabele personages. Introduceer één uniek personage dat past in de gegeven setting."
+            //};
+
+            //var plotGenerator = new ChatCompletionAgent()
+            //{
+            //    Kernel = kernel,
+            //    Name = "Conflict_Generator",
+            //    Instructions = "Jij bent een meester van spanning. Introduceer een onverwachte gebeurtenis of conflict dat past bij de setting en het personage.",
+            //    Description= "Jij bent een meester van spanning. Introduceer een onverwachte gebeurtenis of conflicten voor het verhaal."
+            //};
 
 
             ChatHistory history = [];
@@ -70,7 +107,7 @@ namespace Storyteller.Demos
                 ResponseCallback = responseCallback,
                 //StreamingResponseCallback = monitor.StreamingResultCallback,
             };
-            string userInput = "Een luchtschip van glimmend koper en hout landt zachtjes in een verborgen junglevallei.";
+            string userInput = "An airship of gleaming brass and wood lands softly in a hidden jungle valley.";
 
             Console.WriteLine($"GEZAMENLIJKE INPUT: \"{userInput}\"\n");
             Console.WriteLine("--- Resultaten van de Brainstorm ---");
