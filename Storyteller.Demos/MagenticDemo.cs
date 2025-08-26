@@ -12,8 +12,9 @@ namespace Storyteller.Demos
 {
     public class MagenticDemo
     {
-        public async Task RunAsync()
-        {
+        public async Task RunAsync(bool showOrchistrationCallback, bool showOrchistrationHistory)
+
+		{
             Kernel kernel = await KernelFactory.CreateKernelForModel();
 
             // Agent 1: The initial idea generator.

@@ -27,8 +27,8 @@ namespace Storyteller.Demos
 {
     public class SequentialDemo
     {
-        public async Task RunAsync()
-        {
+        public async Task RunAsync(bool showOrchistrationCallback, bool showOrchistrationHistory)
+		{
             Kernel kernel = await KernelFactory.CreateKernelForModel();
             var worldBuilder = new ChatCompletionAgent()
             {
@@ -74,7 +74,7 @@ namespace Storyteller.Demos
                 return ValueTask.CompletedTask;
             }
             // --- Orchestratie ---
-            OrchestrationMonitor monitor = new();
+            OrchestrationMonitor monitor = new(showOrchistrationCallback);
             
             var orchestration = new SequentialOrchestration(worldBuilder, characterCreator, plotGenerator)
             {
@@ -94,19 +94,24 @@ namespace Storyteller.Demos
 
             
             string output = await results.GetValueAsync(TimeSpan.FromSeconds(3000));
-            Console.ForegroundColor = ConsoleColor.DarkBlue;
-            Console.WriteLine($"\n# RESULT: {output}");
-            Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.WriteLine("\n\nORCHESTRATION HISTORY");
+			Console.ForegroundColor = ConsoleColor.DarkBlue;
+			Console.WriteLine($"\n# FINAL RESULT:\n{output}");
+			Console.ResetColor();
 
-            foreach (Microsoft.SemanticKernel.ChatMessageContent message in history)
+			if (showOrchistrationHistory)
             {
-                AIHelpers.WriteAgentChatMessage(message);
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.WriteLine("\n\nORCHESTRATION HISTORY\n");
+
+                foreach (Microsoft.SemanticKernel.ChatMessageContent message in history)
+                {
+                    AIHelpers.WriteAgentChatMessage(message);
+                }
             }
             await runtime.RunUntilIdleAsync();
-          
-          
-            Console.ForegroundColor = ConsoleColor.White;
-        }  
+
+
+			Console.ResetColor();
+		}  
     }
 }

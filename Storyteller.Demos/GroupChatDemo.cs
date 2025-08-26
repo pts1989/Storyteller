@@ -12,7 +12,7 @@ namespace Storyteller.Demos
 {
     public class GroupChatDemo
     {
-        public async Task RunAsync()
+        public async Task RunAsync(bool showOrchistrationCallback, bool showOrchistrationHistory)
         {
             Kernel kernel = await KernelFactory.CreateKernelForModel();
 
@@ -92,17 +92,20 @@ namespace Storyteller.Demos
 
             // Display the final summary from the orchestration.
             string output = await results.GetValueAsync(TimeSpan.FromSeconds(300));
-            Console.BackgroundColor = ConsoleColor.DarkBlue;
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine($"\n# FINAL SUMMARY: {output}");
+            Console.ForegroundColor = ConsoleColor.DarkBlue;
+            Console.WriteLine($"\n# FINAL RESULT:\n{output}");
             Console.ResetColor();
 
             // Display the full conversation history.
-            Console.WriteLine("\n\n--- ORCHESTRATION HISTORY ---\n");
-            foreach (ChatMessageContent message in history)
+            if (showOrchistrationHistory)
             {
-                // Helper method to format and print agent messages.
-                AIHelpers.WriteAgentChatMessage(message);
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.WriteLine("\n\nORCHESTRATION HISTORY\n");
+
+                foreach (Microsoft.SemanticKernel.ChatMessageContent message in history)
+                {
+                    AIHelpers.WriteAgentChatMessage(message);
+                }
             }
 
             await runtime.RunUntilIdleAsync();

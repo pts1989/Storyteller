@@ -13,8 +13,8 @@ namespace Storyteller.Demos
 {
     public class HandoffDemo
     {
-        public async Task RunAsync()
-        {
+        public async Task RunAsync(bool showOrchistrationCallback, bool showOrchistrationHistory)
+		{
             Kernel kernel = await KernelFactory.CreateKernelForModel();
 
             var storyteller = new ChatCompletionAgent()
@@ -73,7 +73,7 @@ namespace Storyteller.Demos
                 Arguments = new KernelArguments(new OpenAIPromptExecutionSettings { FunctionChoiceBehavior = FunctionChoiceBehavior.None() }),
             };
 
-            OrchestrationMonitor monitor = new();
+            OrchestrationMonitor monitor = new(showOrchistrationCallback);
             var handoffs = OrchestrationHandoffs
                 .StartWith(storyteller)
                 .Add(storyteller, loreMaster, goalSetter, monsterCreator, riddleMaker)
@@ -125,22 +125,24 @@ namespace Storyteller.Demos
 
 
             string output = await results.GetValueAsync();
-            Console.BackgroundColor = ConsoleColor.DarkBlue;
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine($"\n# RESULT: {output}");
-            Console.BackgroundColor = ConsoleColor.White;
-            Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.WriteLine("\n\nORCHESTRATION HISTORY");
+			Console.ForegroundColor = ConsoleColor.DarkBlue;
+			Console.WriteLine($"\n# FINAL RESULT:\n{output}");
+			Console.ResetColor();
 
-            foreach (Microsoft.SemanticKernel.ChatMessageContent message in monitor.History)
-            {
-                AIHelpers.WriteAgentChatMessage(message);
-            }
-            await runtime.RunUntilIdleAsync();
+			if (showOrchistrationHistory)
+			{
+				Console.ForegroundColor = ConsoleColor.DarkGreen;
+				Console.WriteLine("\n\nORCHESTRATION HISTORY\n");
+
+				foreach (Microsoft.SemanticKernel.ChatMessageContent message in monitor.History)
+				{
+					AIHelpers.WriteAgentChatMessage(message);
+				}
+			}
+			await runtime.RunUntilIdleAsync();
 
 
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.BackgroundColor = ConsoleColor.Black;
-        }
+			Console.ResetColor();
+		}
     }
 }

@@ -13,12 +13,22 @@ namespace Storyteller.Demos.internalUtilities
     {
         public List<StreamingChatMessageContent> StreamedResponses = [];
 
+        private bool printCallBack;
+
+        public OrchestrationMonitor(bool printCallBack = true)
+        {
+            this.printCallBack = printCallBack;
+        }
+
         public ChatHistory History { get; } = [];
 
         public ValueTask ResponseCallback(Microsoft.SemanticKernel.ChatMessageContent response)
         {
             this.History.Add(response);
-            WriteResponse(response);
+            if (printCallBack)
+            {
+                WriteResponse(response);
+            }
             return ValueTask.CompletedTask;
         }
 

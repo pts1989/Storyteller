@@ -10,7 +10,7 @@ namespace Storyteller.Demos
 {
     public class ConcurrentDemo
     {
-        public async Task RunAsync()
+        public async Task RunAsync(bool showOrchistrationCallback, bool showOrchistrationHistory)
         {
             Kernel kernel = await KernelFactory.CreateKernelForModel();
             // OPLOSSING: Voeg een 'Description' toe aan elke agent.
@@ -55,7 +55,7 @@ namespace Storyteller.Demos
            
 
             // --- Orchestratie ---
-            OrchestrationMonitor monitor = new();
+            OrchestrationMonitor monitor = new(showOrchistrationCallback);
             
             var orchestration = new ConcurrentOrchestration(fantasyExpert, scifiExpert, horrorExpert)
             {
@@ -73,19 +73,22 @@ namespace Storyteller.Demos
 
             
             string[] output = await results.GetValueAsync(TimeSpan.FromSeconds(3000));
-            Console.BackgroundColor = ConsoleColor.DarkBlue;
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine($"\n# RESULT:\n{string.Join("\n\n", output.Select(text => $"{text}"))}");
+            Console.ForegroundColor = ConsoleColor.DarkBlue;
+            Console.WriteLine($"\n# FINAL RESULT:\n{output}");
+            Console.ResetColor();
 
             await runtime.RunUntilIdleAsync();
-            Console.BackgroundColor = ConsoleColor.White;
-            Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.WriteLine("\n\nORCHESTRATION HISTORY");
-            foreach (Microsoft.SemanticKernel.ChatMessageContent message in monitor.History)
+            if (showOrchistrationHistory)
             {
-                AIHelpers.WriteAgentChatMessage(message);
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.WriteLine("\n\nORCHESTRATION HISTORY\n");
+
+                foreach (Microsoft.SemanticKernel.ChatMessageContent message in monitor.History)
+                {
+                    AIHelpers.WriteAgentChatMessage(message);
+                }
             }
-            Console.ForegroundColor = ConsoleColor.White;
+            Console.ResetColor();
         }  
     }
 }
