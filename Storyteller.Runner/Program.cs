@@ -39,25 +39,32 @@ namespace Storyteller.Runner
                 Console.WriteLine("1. Orchestration history");
                 Console.WriteLine("2. Orchestration callbacks ");
                 Console.WriteLine("3. Orchestration history and Orchestration callbacks ");
-                Console.WriteLine("\n0. Exit");
+                Console.WriteLine("\n0. None");
                 Console.Write("\nYour choice: ");
 
                 switch (Console.ReadLine())
                 {
                     case "1":
                         showOrchistrationCallback = false;
-                        showOrchistrationHistory = false;
+                        showOrchistrationHistory = true;
+                        exit = true;
                         break;
                     case "2":
                         showOrchistrationCallback = true;
                         showOrchistrationHistory = false;
+                        exit = true;
                         break;
                     case "3":
                         showOrchistrationCallback = true;
                         showOrchistrationHistory = true;
+                        exit = true;
                         break;
-                  
-                    
+                    case "0":
+                        showOrchistrationCallback = false;
+                        showOrchistrationHistory = false;
+                        exit = true;
+                        break;
+
                     default:
                         Console.WriteLine("Invalid choice. Try again.");
                         break;
@@ -89,16 +96,16 @@ namespace Storyteller.Runner
                         await concurrentDemo.RunAsync(showOrchistrationCallback, showOrchistrationHistory);
                         break;
                     case "2":
-                        await sequentialDemo.RunAsync(showOrchistrationCallback, showOrchistrationHistory));
+                        await sequentialDemo.RunAsync(showOrchistrationCallback, showOrchistrationHistory);
                         break;
                     case "3":
-                        await groupChatDemo.RunAsync(showOrchistrationCallback, showOrchistrationHistory));
+                        await groupChatDemo.RunAsync(showOrchistrationCallback, showOrchistrationHistory);
                         break;
                     case "4":
-                        await handsoffDemo.RunAsync(showOrchistrationCallback, showOrchistrationHistory));
+                        await handsoffDemo.RunAsync(showOrchistrationCallback, showOrchistrationHistory);
                         break;
                     case "5":
-                        await magenticDemo.RunAsync(showOrchistrationCallback, showOrchistrationHistory));
+                        await magenticDemo.RunAsync(showOrchistrationCallback, showOrchistrationHistory);
                         break;
                     case "0":
                         exit = true;

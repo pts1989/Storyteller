@@ -80,7 +80,7 @@ namespace Storyteller.Demos
             };
 
             // --- Orchestration ---
-            var monitor = new OrchestrationMonitor();
+            var monitor = new OrchestrationMonitor(showOrchistrationCallback);
             Kernel managerKernel = await KernelFactory.CreateKernelForModel();
 
             var manager =
@@ -110,15 +110,18 @@ namespace Storyteller.Demos
             Console.ForegroundColor = ConsoleColor.DarkBlue;
             Console.WriteLine($"\n# FINAL RESULT:\n{output}");
             Console.ResetColor();
+			if (showOrchistrationHistory)
+			{
+				Console.ForegroundColor = ConsoleColor.DarkGreen;
+				Console.WriteLine("\n\nORCHESTRATION HISTORY\n");
 
-            // Display the full conversation history.
-            Console.WriteLine("\n\n--- ORCHESTRATION HISTORY ---\n");
-            foreach (ChatMessageContent message in monitor.History)
-            {
-                AIHelpers.WriteAgentChatMessage(message);
-            }
+				foreach (Microsoft.SemanticKernel.ChatMessageContent message in monitor.History)
+				{
+					AIHelpers.WriteAgentChatMessage(message);
+				}
+			}
 
-            await runtime.RunUntilIdleAsync();
+			await runtime.RunUntilIdleAsync();
             Console.ResetColor();
         }
     }
