@@ -12,7 +12,7 @@ namespace Storyteller.Demos
     {
         public async Task RunAsync()
         {
-            Kernel kernel = KernelFactory.CreateKernelForModel("qwen3:8b");
+            Kernel kernel = await KernelFactory.CreateKernelForModel();
             // OPLOSSING: Voeg een 'Description' toe aan elke agent.
             var fantasyExpert = new ChatCompletionAgent()
             {
@@ -52,29 +52,7 @@ namespace Storyteller.Demos
                     Focus on unsettling details: a silence that is too deep, a shadow that moves wrong, a sound that doesn't belong.
                     """
             };
-            //var fantasyExpert = new ChatCompletionAgent()
-            //{
-            //    Kernel = kernel,
-            //    Name = "Fantasy_Expert",
-            //    Description = "Gespecialiseerd in het schrijven van epische en magische fantasy verhalen.",
-            //    Instructions = "Jij bent een expert in epische fantasy. Schrijf een sfeervolle, magische openingsscène."
-            //};
-
-            //var scifiExpert = new ChatCompletionAgent()
-            //{
-            //    Kernel = kernel,
-            //    Name = "SciFi_Expert",
-            //    Description = "Gespecialiseerd in het schrijven van futuristische en technologische sciencefiction verhalen.",
-            //    Instructions = "Jij bent een expert in sciencefiction. Schrijf een futuristische, technologische openingsscène."
-            //};
-
-            //var horrorExpert = new ChatCompletionAgent()
-            //{
-            //    Kernel= kernel,
-            //    Name = "Horror_Expert",
-            //    Description = "Gespecialiseerd in het schrijven van enge en onheilspellende horror verhalen.",
-            //    Instructions = "Jij bent een expert in horror. Schrijf een enge, onheilspellende openingsscène."
-            //};
+           
 
             // --- Orchestratie ---
             OrchestrationMonitor monitor = new();

@@ -14,12 +14,12 @@ namespace Storyteller.Demos
     {
         public async Task RunAsync()
         {
-            Kernel kernel = KernelFactory.CreateKernelForModel("qwen3:8b");
+            Kernel kernel = await KernelFactory.CreateKernelForModel();
 
             // Agent 1: The initial idea generator.
             var conceptAgent = new ChatCompletionAgent()
             {
-                Kernel = KernelFactory.CreateKernelForModel("qwen3:8b"),
+                Kernel = await KernelFactory.CreateKernelForModel(),
                 Name = "ConceptAgent",
                 Description = "You are an expert at creating high-level concepts for roleplay characters. Other agents will handle the details.",
                 Instructions =
@@ -37,7 +37,7 @@ namespace Storyteller.Demos
             // Agent 2: The storyteller who fleshes out the concept.
             var backgroundExpert = new ChatCompletionAgent()
             {
-                Kernel = KernelFactory.CreateKernelForModel("qwen3:8b"),
+                Kernel = await KernelFactory.CreateKernelForModel(),
                 Name = "BackgroundExpert",
                 Description = "Writes a short, atmospheric background story for a character concept.",
                 Instructions =
@@ -50,7 +50,7 @@ namespace Storyteller.Demos
             // Agent 3: The namer who uses the background to find a fitting name.
             var nameGenerator = new ChatCompletionAgent()
             {
-                Kernel = KernelFactory.CreateKernelForModel("qwen3:8b"),
+                Kernel = await KernelFactory.CreateKernelForModel(),
                 Name = "NameGenerator",
                 Description = "Generates a fitting and unique name based on a character's background.",
                 Instructions = "You are a master namer. Based on the concept and background story from the other agents, generate one fitting and memorable name for the character."
@@ -80,7 +80,7 @@ namespace Storyteller.Demos
 
             // --- Orchestration ---
             var monitor = new OrchestrationMonitor();
-            Kernel managerKernel = KernelFactory.CreateKernelForModel("qwen3:8b");
+            Kernel managerKernel = await KernelFactory.CreateKernelForModel();
 
             var manager =
                 new StandardMagenticManager(managerKernel.GetRequiredService<IChatCompletionService>(), new OpenAIPromptExecutionSettings())

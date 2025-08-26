@@ -15,27 +15,8 @@ namespace Storyteller.Demos
     {
         public async Task RunAsync()
         {
-            Kernel kernel = KernelFactory.CreateKernelForModel("qwen3:8b");
-            //var storyteller = new ChatCompletionAgent()
-            //{
-            //    Kernel = kernel,
-            //    Name = "Storyteller",
-            //    Description = "Je bent de hoofdstoryteller die als triage-agent fungeert. Je bepaalt welke specialist nodig is voor de volgende stap.",
-            //    Instructions =
-            //        """
-            //        Analyseer de input van de gebruiker. Jouw enige taak is om te bepalen welke expert hierna nodig is.
-            //        - Als de input gaat over de achtergrond of het verhaal, antwoord dan met ALLEEN de tekst: Lore_Master
-            //        - Als de input gaat over het doel van de quest, antwoord dan met ALLEEN de tekst: Goal_Setter
-            //        - Als de input gaat over een monster, antwoord dan met ALLEEN de tekst: Monster_Creator
-            //        - Als de input gaat over een raadsel, antwoord dan met ALLEEN de tekst: Riddle_Maker
-            //        Geef geen andere tekst of uitleg.
-            //        """,
-            //        Arguments = new KernelArguments(
-            //    new OpenAIPromptExecutionSettings()
-            //    {
-            //        FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
-            //    }),
-            //};
+            Kernel kernel = await KernelFactory.CreateKernelForModel();
+
             var storyteller = new ChatCompletionAgent()
             {
                 Kernel = kernel,
@@ -52,60 +33,10 @@ namespace Storyteller.Demos
                     """,
                 Arguments = new KernelArguments(new OpenAIPromptExecutionSettings { FunctionChoiceBehavior = FunctionChoiceBehavior.Auto() }),
             };
-            //var loreMaster = new ChatCompletionAgent()
-            //{
-            //    Kernel = KernelFactory.CreateKernelForModel("qwen3:8b"),
-            //    Name = "Lore_Master",
-            //    Description = "Bedenkt de achtergrond en naam voor een quest.",
-            //    Instructions = "Bedenk een interessante achtergrond en een pakkende naam voor een quest.",
-            //    Arguments = new KernelArguments(
-            //    new OpenAIPromptExecutionSettings()
-            //    {
-            //        FunctionChoiceBehavior = FunctionChoiceBehavior.None()
-            //    }),
-            //};
-            //var goalSetter = new ChatCompletionAgent()
-            //{
-            //    Kernel = KernelFactory.CreateKernelForModel("qwen3:8b"),
-            //    Name = "Goal_Setter",
-            //    Description = "Definieert het einddoel van een quest.",
-            //    Instructions = "Definieer een duidelijk en uitdagend einddoel voor een quest.",
 
-            //    Arguments = new KernelArguments(
-            //    new OpenAIPromptExecutionSettings()
-            //    {
-            //        FunctionChoiceBehavior = FunctionChoiceBehavior.None()
-            //    }),
-            //};
-            //var monsterCreator = new ChatCompletionAgent()
-            //{
-            //    Kernel = KernelFactory.CreateKernelForModel("qwen3:8b"),
-            //    Name = "Monster_Creator",
-            //    Description = "Ontwerpt een uniek monster passend bij de quest.",
-
-            //    Instructions = "Bedenk een uniek monster dat een pad bewaakt, passend bij de quest.",
-            //    Arguments = new KernelArguments(
-            //    new OpenAIPromptExecutionSettings()
-            //    {
-            //        FunctionChoiceBehavior = FunctionChoiceBehavior.None()
-            //    }),
-            //};
-            //var riddleMaker = new ChatCompletionAgent()
-            //{
-            //    Kernel = KernelFactory.CreateKernelForModel("qwen3:8b"),
-            //    Name = "Riddle_Maker",
-            //    Description = "Schrijft een raadsel passend bij de quest.",
-            //    Instructions = "Schrijf een slim raadsel voor een magische barrière, passend bij de quest.",
-            //    Arguments = new KernelArguments(
-            //    new OpenAIPromptExecutionSettings()
-            //    {
-            //        FunctionChoiceBehavior = FunctionChoiceBehavior.None()
-            //    })
-
-            //};
             var loreMaster = new ChatCompletionAgent()
             {
-                Kernel = KernelFactory.CreateKernelForModel("qwen3:8b"),
+                Kernel = await KernelFactory.CreateKernelForModel(),
                 Name = "Lore_Master",
                 Description = "World-builder who crafts the background story and name for a quest.",
                 Instructions = "You are a master world-builder and historian. Based on the user's request and the conversation history, craft a rich, compelling background story for a fantasy quest. Conclude with a fitting and evocative name for the quest. The tone should be mysterious and epic.",
@@ -115,7 +46,7 @@ namespace Storyteller.Demos
             // Specialist Agent: Defines the quest's main goal.
             var goalSetter = new ChatCompletionAgent()
             {
-                Kernel = KernelFactory.CreateKernelForModel("qwen3:8b"),
+                Kernel = await  KernelFactory.CreateKernelForModel(),
                 Name = "Goal_Setter",
                 Description = "Quest designer who defines the final objective of a quest.",
                 Instructions = "You are a master quest designer. Using the established lore from the conversation history, define a clear, challenging, and rewarding final objective for the quest. The goal should be specific and actionable.",
@@ -125,7 +56,7 @@ namespace Storyteller.Demos
             // Specialist Agent: Designs a monster for the quest.
             var monsterCreator = new ChatCompletionAgent()
             {
-                Kernel = KernelFactory.CreateKernelForModel("qwen3:8b"),
+                Kernel = await KernelFactory.CreateKernelForModel(),
                 Name = "Monster_Creator",
                 Description = "Creature designer who creates a unique monster fitting for the quest.",
                 Instructions = "You are a legendary creature designer. Based on the quest's theme and lore from the conversation history, design a unique and fearsome monster. Describe its appearance, abilities, and why it guards a crucial path or location within the quest.",
@@ -135,7 +66,7 @@ namespace Storyteller.Demos
             // Specialist Agent: Creates a riddle for the quest.
             var riddleMaker = new ChatCompletionAgent()
             {
-                Kernel = KernelFactory.CreateKernelForModel("qwen3:8b"),
+                Kernel = await KernelFactory.CreateKernelForModel(),
                 Name = "Riddle_Maker",
                 Description = "Puzzle master who writes a clever riddle fitting for the quest.",
                 Instructions = "You are a master of puzzles and enigmas. Drawing inspiration from the established quest lore in the conversation history, write a clever and thematic riddle. The riddle will be used to unlock a magical barrier or a hidden secret. Provide the riddle and the answer separately.",
@@ -159,10 +90,7 @@ namespace Storyteller.Demos
                 .Add(goalSetter, storyteller, "Return to the router after the quest goal has been defined.")
                 .Add(monsterCreator, storyteller, "Return to the router after the monster has been created.")
                 .Add(riddleMaker, storyteller, "Return to the router after the riddle has been written.");
-            //.Add(loreMaster, storyteller, "Transfer to this agent if the issue is lore related")
-            //.Add(goalSetter, storyteller, "Transfer to this agent if the issue is goal related")
-            //.Add(monsterCreator, storyteller, "Transfer to this agent if the issue is monster related")
-            //.Add(riddleMaker, storyteller, "Transfer to this agent if the issue is riddle related");
+
 
             ValueTask<Microsoft.SemanticKernel.ChatMessageContent> interactiveCallback()
             {

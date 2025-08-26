@@ -14,7 +14,7 @@ namespace Storyteller.Demos
     {
         public async Task RunAsync()
         {
-            Kernel kernel = KernelFactory.CreateKernelForModel("qwen3:8b");
+            Kernel kernel = await KernelFactory.CreateKernelForModel();
 
             // Agent 1: The Hero
             var hero = new ChatCompletionAgent()

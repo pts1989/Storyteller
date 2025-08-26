@@ -29,7 +29,7 @@ namespace Storyteller.Demos
     {
         public async Task RunAsync()
         {
-            Kernel kernel = KernelFactory.CreateKernelForModel("qwen3:8b");
+            Kernel kernel = await KernelFactory.CreateKernelForModel();
             var worldBuilder = new ChatCompletionAgent()
             {
                 Kernel = kernel,
@@ -65,32 +65,6 @@ namespace Storyteller.Demos
                     Your goal is to create tension and leave a question in the reader's mind about what will happen next. Build directly upon the established setting and character actions.
                     """
             };
-
-
-
-            //var worldBuilder = new ChatCompletionAgent()
-            //{
-            //    Kernel = kernel,
-            //    Name = "Omgevings_Specialist",
-            //    Instructions = "Jij bent een meester-verhalenverteller. Beschrijf een rijke, sfeervolle omgeving op basis van de input. Focus enkel op de omgeving.",
-            //    Description = "Jij bent een meester-verhalenverteller. Beschrijf een rijke, sfeervolle omgeving op basis van de input."
-            //};
-
-            //var characterCreator = new ChatCompletionAgent()
-            //{
-            //    Kernel = kernel,
-            //    Name = "Personage_Ontwerper",
-            //    Description = "Jij creëert memorabele personages. ",
-            //    Instructions = "Jij creëert memorabele personages. Introduceer één uniek personage dat past in de gegeven setting."
-            //};
-
-            //var plotGenerator = new ChatCompletionAgent()
-            //{
-            //    Kernel = kernel,
-            //    Name = "Conflict_Generator",
-            //    Instructions = "Jij bent een meester van spanning. Introduceer een onverwachte gebeurtenis of conflict dat past bij de setting en het personage.",
-            //    Description= "Jij bent een meester van spanning. Introduceer een onverwachte gebeurtenis of conflicten voor het verhaal."
-            //};
 
 
             ChatHistory history = [];
