@@ -99,8 +99,19 @@ namespace Storyteller.Demos
                 Console.WriteLine($"\n# INPUT: {input}\n");
                 return ValueTask.FromResult(new Microsoft.SemanticKernel.ChatMessageContent(AuthorRole.User, input));
             }
+			ChatHistory history = [];
 
-            HandoffOrchestration orchestration = new HandoffOrchestration(
+			ValueTask ResponseCallback(ChatMessageContent response)
+			{
+				Console.ForegroundColor = ConsoleColor.Cyan;
+
+				Console.WriteLine(response.AuthorName+ " : " +response.Content);
+				Console.ForegroundColor = ConsoleColor.Red;
+				history.Add(response);
+				return ValueTask.CompletedTask;
+			}
+
+			HandoffOrchestration orchestration = new HandoffOrchestration(
                 handoffs,
                 storyteller,
                 loreMaster,
@@ -109,7 +120,7 @@ namespace Storyteller.Demos
                 riddleMaker)
             {
                 InteractiveCallback = interactiveCallback,
-                ResponseCallback = monitor.ResponseCallback,
+                ResponseCallback = ResponseCallback,
             };
 
             string userInput = "I want to create an atmospheric background for my quest about a cursed forest.";
@@ -125,7 +136,7 @@ namespace Storyteller.Demos
 
 
             string output = await results.GetValueAsync();
-			Console.ForegroundColor = ConsoleColor.DarkBlue;
+			Console.ForegroundColor = ConsoleColor.Cyan;
 			Console.WriteLine($"\n# FINAL RESULT:\n{output}");
 			Console.ResetColor();
 
@@ -134,7 +145,7 @@ namespace Storyteller.Demos
 				Console.ForegroundColor = ConsoleColor.DarkGreen;
 				Console.WriteLine("\n\nORCHESTRATION HISTORY\n");
 
-				foreach (Microsoft.SemanticKernel.ChatMessageContent message in monitor.History)
+				foreach (Microsoft.SemanticKernel.ChatMessageContent message in history)
 				{
 					AIHelpers.WriteAgentChatMessage(message);
 				}

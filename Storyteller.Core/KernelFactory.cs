@@ -16,16 +16,16 @@ namespace Storyteller.Core
 
         // Deze methode maakt een nieuwe Kernel aan die verbonden is
         // met een specifiek model op je lokale Ollama instance.
-        public static async Task<Kernel> CreateKernelForModel(string modelId = "mistral-7b-v0.2")
+        public static async Task<Kernel> CreateKernelForModel(string modelId = "phi-4-mini")
         {
          
             var builder = Kernel.CreateBuilder();
 
 
-            //AzureFoundry Local demo
-            Console.WriteLine("\n\nLOADING MODAL " + modelId);
+            //////AzureFoundry Local demo
+            Console.WriteLine("\n\nLOADING " + modelId);
             var manager = await FoundryLocalManager.StartModelAsync(aliasOrModelId: modelId);
-            Console.WriteLine("\n\nMODAL LOADED \n\n ");
+            Console.WriteLine("\n\nLOADED \n\n ");
             var model = await manager.GetModelInfoAsync(aliasOrModelId: modelId);
 
             builder.AddOpenAIChatCompletion(
@@ -34,19 +34,35 @@ namespace Storyteller.Core
                 endpoint: manager.Endpoint
             );
 
-            // Ollama Local demo
+            // Ollama Local demo //works with mcp
             //builder.AddOllamaChatCompletion(
-            //    modelId: modelId,
+            //    modelId: "gpt-oss:20b",
             //    endpoint: new Uri("http://localhost:11434")
             //); // Standaard Ollama endpoint
 
             //// Azure Ai Foundry demo
             //builder.AddAzureOpenAIChatCompletion(
-            //    deploymentName: "gpt-4o-mini",
-            //    apiKey: ConfigurationHelper.config.GetSection("apiKey").Value,
-            //    endpoint: "https://ai-paulstolk7788ai591892606067.openai.azure.com/",
-            //    modelId: "gpt-4o-mini" 
+            //    deploymentName: "gpt-5-mini",
+            //    apiKey: ConfigurationHelper.config.GetSection("gpt").Value,
+            //    endpoint: ConfigurationHelper.config.GetSection("azureAIFoundryUrl").Value,
+            //    modelId: "gpt-5-mini"
             //);
+
+
+            //builder.AddAzureOpenAIChatCompletion(
+            //    deploymentName: "gpt-4o",
+            //    apiKey: ConfigurationHelper.config.GetSection("apikey").Value,
+            //    endpoint: ConfigurationHelper.config.GetSection("azureAIFoundryUrl").Value,
+            //    modelId: "gpt-4o"
+            //);
+
+            //builder.AddAzureOpenAIChatCompletion(
+            //    deploymentName: "gpt-oss-120b",
+            //    apiKey: ConfigurationHelper.config.GetSection("apikey").Value,
+            //    endpoint: ConfigurationHelper.config.GetSection("azureAIFoundryUrl").Value,
+            //    modelId: "gpt-oss-120b"
+            //);
+
 
             return builder.Build(); 
         }

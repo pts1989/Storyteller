@@ -5,6 +5,7 @@ using Microsoft.SemanticKernel.Agents.Orchestration.Concurrent;
 using Microsoft.SemanticKernel.Agents.Runtime.InProcess;
 using Storyteller.Core;
 using Storyteller.Demos.internalUtilities;
+using System.Linq;
 
 namespace Storyteller.Demos
 {
@@ -73,8 +74,9 @@ namespace Storyteller.Demos
 
             
             string[] output = await results.GetValueAsync(TimeSpan.FromSeconds(3000));
-            Console.ForegroundColor = ConsoleColor.DarkBlue;
-            Console.WriteLine($"\n# FINAL RESULT:\n{output}");
+            string story = String.Join("\r\n", output);
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine($"\n# FINAL RESULT:\n{story}");
             Console.ResetColor();
 
             await runtime.RunUntilIdleAsync();

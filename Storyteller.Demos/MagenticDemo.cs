@@ -107,7 +107,7 @@ namespace Storyteller.Demos
 
             // Display the final result.
             string output = await results.GetValueAsync();
-            Console.ForegroundColor = ConsoleColor.DarkBlue;
+            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine($"\n# FINAL RESULT:\n{output}");
             Console.ResetColor();
 			if (showOrchistrationHistory)

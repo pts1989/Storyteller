@@ -17,6 +17,8 @@ namespace Storyteller.Runner
             var sequentialDemo = new SequentialDemo();
             var groupChatDemo = new GroupChatDemo();
             var magenticDemo = new MagenticDemo();
+            var MCPDemo = new MCPDEMO();
+            var MCPsequential = new MCPDemoSequential();
             IConfigurationRoot config = new ConfigurationBuilder()
            .AddUserSecrets<Program>()
            .Build();
@@ -87,6 +89,8 @@ namespace Storyteller.Runner
                 Console.WriteLine("3. Group Chat Orchestration (The Interactive Dialogue) ");
                 Console.WriteLine("4. Handoffs Orchestration (The Layered Quest) ");
                 Console.WriteLine("5. Agentic Orchestration (The Autonomous Writer) ");
+                Console.WriteLine("6. Group Chat Orchestration MCP Demo ");
+                Console.WriteLine("7. Sequential Orchestration MCP Demo ");
                 Console.WriteLine("\n0. Exit");
                 Console.Write("\nYour choice: ");
 
@@ -106,6 +110,12 @@ namespace Storyteller.Runner
                         break;
                     case "5":
                         await magenticDemo.RunAsync(showOrchistrationCallback, showOrchistrationHistory);
+                        break;
+                    case "6":
+                        await MCPDemo.RunAsync(showOrchistrationCallback, showOrchistrationHistory);
+                        break;
+                    case "7":
+                        await MCPsequential.RunAsync(showOrchistrationCallback, showOrchistrationHistory);
                         break;
                     case "0":
                         exit = true;

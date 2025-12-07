@@ -24,6 +24,7 @@ namespace Storyteller.Demos.internalUtilities
 
         public ValueTask ResponseCallback(Microsoft.SemanticKernel.ChatMessageContent response)
         {
+           
             this.History.Add(response);
             if (printCallBack)
             {

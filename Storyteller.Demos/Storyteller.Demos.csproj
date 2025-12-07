@@ -7,18 +7,30 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.AI.Agents.Persistent" Version="1.2.0-beta.3" />
-    <PackageReference Include="Microsoft.SemanticKernel" Version="1.63.0" />
-    <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.63.0" />
-    <PackageReference Include="Microsoft.SemanticKernel.Agents.Magentic" Version="1.63.0-preview" />
-    <PackageReference Include="Microsoft.SemanticKernel.Agents.OpenAI" Version="1.63.0-preview" />
-    <PackageReference Include="Microsoft.SemanticKernel.Agents.Orchestration" Version="1.63.0-preview" />
-    <PackageReference Include="Microsoft.SemanticKernel.Agents.Runtime.InProcess" Version="1.63.0-preview" />
-    <PackageReference Include="OllamaSharp" Version="5.3.6" />
+    <PackageReference Include="Azure.AI.Agents.Persistent" Version="1.2.0-beta.6" />
+    <PackageReference Include="Microsoft.SemanticKernel" Version="1.66.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.66.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.Agents.Magentic" Version="1.66.0-preview" />
+    <PackageReference Include="Microsoft.SemanticKernel.Agents.OpenAI" Version="1.66.0-preview" />
+    <PackageReference Include="Microsoft.SemanticKernel.Agents.Orchestration" Version="1.66.0-preview" />
+    <PackageReference Include="Microsoft.SemanticKernel.Agents.Runtime.InProcess" Version="1.66.0-preview" />
+    <PackageReference Include="ModelContextProtocol" Version="0.4.0-preview.3" />
+    <PackageReference Include="OllamaSharp" Version="5.4.8" />
+    <PackageReference Include="OllamaSharp.ModelContextProtocol" Version="5.4.8" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Storyteller.Core\Storyteller.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Output\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Output\readme.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
